@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#512DA8"/>
+    <title>SitemapScanner | Extract the contents of a sitemap</title>
+    <link rel="shortcut icon" href="/favicon.svg" type="image/x-icon">
+    <meta name="description"
+        content="SitemapScanner is a powerful tool that helps you quickly and easily extract the contents of a sitemap. With just a few clicks, you can scan and render a sitemap into a user-friendly format, giving you access to all the pages and resources on a website. Whether you're a developer looking to analyze the structure of a website or a content creator looking for inspiration, SitemapScanner has you covered. With its intuitive interface and fast performance, you'll be able to scan and extract sitemap contents in no time.">
+    </meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>.flex,.form{gap:10px;display:flex}.button,.field{padding:10px}.flex,.form,body{display:flex}footer,header{min-height:10%}body{font-size:1rem;margin:auto;padding:0;background:#f2f2f2;max-width:340px}@media (min-width:768px){body{max-width:740px}}@media (min-width:1280px){body{max-width:1140px}}.flex-row{flex-direction:row}.flex-center{place-content:center;place-items:center}.form{flex-direction:column}.button{text-transform:uppercase;font-weight:700;background-color:#000;color:#fff;border:1px solid #000;cursor:pointer}.button:hover{background-color:#333}.button:focus{background-color:#666}.spinner-border{width:1rem;height:1rem;border:.2em solid #fff;border-radius:50%;border-top-color:transparent;animation:.75s linear infinite spinner-border}@keyframes spinner-border{from{transform:rotate(0)}to{transform:rotate(360deg)}}html{height:100%}body{min-height:100%;flex-direction:column}section{min-height:80%}footer{margin-top:auto}</style>
+</head>
+
+<body>
+    <header>
+        <h1>SitemapScanner | Extract your sitemap here!</h1>
+    </header>
+    <section>
+        <p>Just add a sitemap into the input, and hit Create Sitemap!</p>
+        <p><small><strong> (eg: https://funkpd.com/sitemap_index.xml)</strong></small></p>
+        <form class="form" action="/create" method="POST" id="sitemapForm">
+            <label for="domain">Domain:</label>
+            <input class="form__text field" type="text" name="domain" id="domain"
+            aria-label="Enter the domain for the sitemap you want to generate"
+            placeholder="https://example.com/sitemap_index.xml">
+            <button class="form__submit button flex flex-row flex-center" type="submit">Create Sitemap</button>
+        </form>
+
+        <div id="response"></div>
+        
+    </section>
+    <footer><a href="https://funkpd.com/" title="goto:funkpd.com">internet with soul.</a></footer>
+    <script src="/main.js" title="JavaScript code for generating sitemaps"></script>
+</body>
+
+</html>
