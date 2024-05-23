@@ -1,59 +1,54 @@
-// main.js
-// document.addEventListener("DOMContentLoaded", () => { waits for the DOM (Document Object Model) to be fully loaded, and then runs the code inside the callback function.
-// const form = document.getElementById("sitemapForm"); selects the form element with the ID "sitemapForm".
-// form.addEventListener("submit", (e) => { adds an event listener to the form that listens for a submit event. When the form is submitted, the callback function runs, which prevents the default behavior of the form submission (e.preventDefault()) and sends a POST request to the "/create" route with the form data.
-// fetch("/create", {...}) sends a POST request to the "/create" route with the form data as the body of the request. The response from the server is then parsed as JSON and processed in the .then() block. If the request is successful and the server returns a "success" field in the response data, the sitemap contents are rendered in the response div. 
-// If the request is unsuccessful or the server returns an error, an alert message is displayed.
-
-console.log("funkpd");
-document.addEventListener("DOMContentLoaded", () => {
-  
-  const form = document.getElementById("sitemapForm");
-  
-  const submitButton = document.querySelector(".form__submit");
-  
-  const responseDiv = document.getElementById("response");
-  
-  form.addEventListener("submit", (e) => {
+document.getElementById('sitemapForm').addEventListener('submit', async function (e) {
     e.preventDefault();
+    const url = document.getElementById('url').value;
+    const submitBtn = document.getElementById('submitBtn');
+    const submitBtnText = document.getElementById('submitBtnText');
+    const spinner = document.getElementById('spinner');
+    const responseField = document.getElementById('response');
     
-    const domain = document.getElementById("domain").value;
-    
-    submitButton.disabled = true;
-    
-    submitButton.innerHTML =
-      '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
-    
-    fetch("/create", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ domain }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          console.log(data.message);
-          console.log(data.data);
-          JSON.parse(data.data).forEach((element) => {
-            responseDiv.innerHTML += "<p>" + element + "</p>";
-          });
-        } else {
-          alert("Something went wrong. Please try again.");
+    // Function to update button text and show spinner
+    function updateButton(text) {
+        submitBtnText.textContent = text;
+        spinner.style.display = 'inline-block';
+    }
+
+    responseField.value = '';
+    submitBtn.disabled = true;
+    updateButton('Fetching data...');
+
+    try {
+        const response = await fetch(`get_sitemap.php?url=${encodeURIComponent(url)}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
         }
-        
-        submitButton.disabled = false;
-        
-        submitButton.innerHTML = "Create Sitemap";
-      })
-      .catch((err) => {
-        console.log(err);
-        alert("Something went wrong. Please try again.");
-        
-        submitButton.disabled = false;
-        
-        submitButton.innerHTML = "Create Sitemap";
-      });
-  });
+
+        updateButton('Getting sitemap...');
+
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.message);
+        }
+
+        updateButton('Parsing sitemap...');
+
+        const cleanText = data.sitemap.join('\n');
+
+        updateButton('Finalizing...');
+
+        responseField.value = cleanText;
+    } catch (error) {
+        responseField.value = 'Error: ' + error.message;
+    } finally {
+        submitBtn.disabled = false;
+        submitBtnText.textContent = 'Create Sitemap';
+        spinner.style.display = 'none';
+    }
 });
+
+function copyText() {
+    var copyText = document.getElementById("response");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // For mobile devices
+    document.execCommand("copy");
+}

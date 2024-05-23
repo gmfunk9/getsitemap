@@ -5,34 +5,69 @@
     <meta charset="UTF-8">
     <meta name="theme-color" content="#512DA8"/>
     <title>SitemapScanner | Extract the contents of a sitemap</title>
-    <link rel="shortcut icon" href="/favicon.svg" type="image/x-icon">
+    <link rel="shortcut icon" href="./favicon.svg" type="image/x-icon">
     <meta name="description"
-        content="SitemapScanner is a powerful tool that helps you quickly and easily extract the contents of a sitemap. With just a few clicks, you can scan and render a sitemap into a user-friendly format, giving you access to all the pages and resources on a website. Whether you're a developer looking to analyze the structure of a website or a content creator looking for inspiration, SitemapScanner has you covered. With its intuitive interface and fast performance, you'll be able to scan and extract sitemap contents in no time.">
+        content="SitemapScanner: Quickly extract sitemap contents with ease. Scan, render, and access all website pages and resources in a user-friendly format. Perfect for developers and content creators!">
     </meta>
+    <meta name="datePublished" 
+        content="2024-12-22">
+    <meta name="dateModified" 
+        content="2024-05-22">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>.flex,.form{gap:10px;display:flex}.button,.field{padding:10px}.flex,.form,body{display:flex}footer,header{min-height:10%}body{font-size:1rem;margin:auto;padding:0;background:#f2f2f2;max-width:340px}@media (min-width:768px){body{max-width:740px}}@media (min-width:1280px){body{max-width:1140px}}.flex-row{flex-direction:row}.flex-center{place-content:center;place-items:center}.form{flex-direction:column}.button{text-transform:uppercase;font-weight:700;background-color:#000;color:#fff;border:1px solid #000;cursor:pointer}.button:hover{background-color:#333}.button:focus{background-color:#666}.spinner-border{width:1rem;height:1rem;border:.2em solid #fff;border-radius:50%;border-top-color:transparent;animation:.75s linear infinite spinner-border}@keyframes spinner-border{from{transform:rotate(0)}to{transform:rotate(360deg)}}html{height:100%}body{min-height:100%;flex-direction:column}section{min-height:80%}footer{margin-top:auto}</style>
+    <style>*{box-sizing:border-box}.flex,.form,body{display:flex}.flex,.form{gap:10px}.button,.field{padding:10px}footer,header{min-height:10%}body{font-size:1rem;margin:auto;padding:0;background:#f2f2f2;max-width:340px;min-height:100%;flex-direction:column}@media (min-width:768px){body{max-width:740px}}@media (min-width:1280px){body{max-width:1140px}}.flex-row{flex-direction:row}.flex-col,.form{flex-direction:column}.flex-center{place-content:center;place-items:center}.button{text-transform:uppercase;font-weight:700;background-color:#000;color:#fff;border:1px solid #000;cursor:pointer;align-items:center;justify-content:center}.button:hover{background-color:#333}.button:focus{background-color:#666}.spinner-border{width:1rem;height:1rem;border:.2em solid #fff;border-radius:50%;border-top-color:transparent;animation:.75s linear infinite spinner-border;display:none;margin-left:10px}@keyframes spinner-border{from{transform:rotate(0)}to{transform:rotate(360deg)}}html{height:100%}section{min-height:80%}footer{margin-top:auto}textarea{width:100%;max-width:100%}</style>
 </head>
 
 <body>
     <header>
-        <h1>SitemapScanner | Extract your sitemap here!</h1>
+        <h1>SitemapScanner v1.2.0 | Extract your sitemap here!</h1>
     </header>
-    <section>
+
+    <section class="flex flex-col">
         <p>Just add a sitemap into the input, and hit Create Sitemap!</p>
         <p><small><strong> (eg: https://funkpd.com/sitemap_index.xml)</strong></small></p>
-        <form class="form" action="/create" method="POST" id="sitemapForm">
-            <label for="domain">Domain:</label>
-            <input class="form__text field" type="text" name="domain" id="domain"
-            aria-label="Enter the domain for the sitemap you want to generate"
-            placeholder="https://example.com/sitemap_index.xml">
-            <button class="form__submit button flex flex-row flex-center" type="submit">Create Sitemap</button>
+        <form class="form" id="sitemapForm">
+            <label for="url">URL:</label>
+            <input  class="form__text field" type="text" name="url" id="url"
+                    aria-label="Enter the URL for the sitemap you want to generate"
+                    placeholder="https://example.com/sitemap_index.xml">
+            <button class="form__submit button flex flex-row flex-center" type="submit" id="submitBtn">
+                <span id="submitBtnText">Create Sitemap</span>
+                <div id="spinner" class="spinner-border"></div>
+            </button>
         </form>
-
-        <div id="response"></div>
-        
+        <div class="flex flex-col">
+            <button id="copy-btn" onclick="copyText()">Copy Text</button>
+            <textarea id="response" rows="5" aria-label="Sitemap response"></textarea>
+        </div>
     </section>
+    <section class="flex flex-col">
+
+        <h2>API</h2>
+        <p>You can also directly use the API to generate a sitemap. To do this, append the URL of the website to the following base URL:</p>
+        <code>https://getsitemap.funkpd.com/json?url=</code>
+        <p>For example, to generate a sitemap for "https://funkpd.com", you would use the following URL:</p>
+        <code>https://getsitemap.funkpd.com/json?url=https://funkpd.com</code>
+
+        <h2 id="why-we-made-sitemapscanner-and-how-we-use-it-at-funkpd">Why We Made SitemapScanner and How We Use It at FunkPd</h2>
+        <p>At FunkPd, we’re in the business of making your digital world run smoother than a freshly greased machine. We’ve been around the block and back, and we know one thing for sure: a website that doesn’t get crawled right is like a book that never gets read. Enter SitemapScanner, our knight in shining armor, ensuring every single page on your site gets the spotlight it deserves.</p>
+        <h4 id="the-big-guns-screaming-frog-ahrefs-and-bing-webmaster-tools">The Big Guns: Screaming Frog, Ahrefs, and Bing Webmaster Tools</h4>
+        <p>Let’s talk about the heavy hitters: Screaming Frog, Ahrefs, and Bing Webmaster Tools. These are the guys you call in when you want your site combed through with a fine-tooth comb. But here’s the kicker—they can only crawl what they can see. Without a complete list of URLs, they’re like bloodhounds with blindfolds. SitemapScanner changes the game. We feed these tools a full buffet of URLs, ensuring no page is left in the dark. It’s like handing them a map to hidden treasure—every page gets its moment in the sun, and your SEO efforts hit full throttle.</p>
+        <p>Picture this: You’ve got a sprawling website, brimming with valuable content. But some of those gems are buried deep, lost in the shuffle. SitemapScanner digs them out, presenting them on a silver platter to our crawler tools. The result? A thorough audit, a clear roadmap, and an optimized site that performs like a dream.</p>
+        <h4 id="fueling-our-custom-creations">Fueling Our Custom Creations</h4>
+        <p>But we don’t just stop at SEO. SitemapScanner is the backbone of our custom applications. Take ScreenshotPro, our tool for capturing every nook and cranny of your site. With SitemapScanner, we get a full roster of URLs, ensuring no page goes un-photographed. This is crucial for quality checks, client presentations, and maintaining a visual history of your site. It’s like having a digital scrapbook that keeps track of every change, every tweak, every enhancement.</p>
+        <p>And then there’s FPMonitor, our watchdog for site performance. FPMonitor needs to know every single URL to keep an eye on uptime and performance. SitemapScanner hands over the complete list, and FPMonitor gets to work, ensuring your site is always up, always fast, and always ready for your users. It’s peace of mind in a piece of code.</p>
+        <h4 id="making-your-life-a-whole-lot-easier">Making Your Life a Whole Lot Easier</h4>
+        <p>At FunkPd, we believe in making your life easier. SitemapScanner does just that. It’s the unsung hero that ensures no page is forgotten, no URL is left out. Whether we’re boosting your SEO, capturing visual records, or monitoring performance, SitemapScanner is there, quietly doing its job, making sure everything runs like clockwork.</p>
+        <p>Our clients? They love it. Knowing that every page is crawled, every performance hiccup is caught, every visual change is logged—it’s a game-changer. It’s a small tool with a massive impact.</p>
+        <h4 id="the-funkpd-touch">The FunkPd Touch</h4>
+        <p>We didn’t create SitemapScanner just for kicks. We did it because we believe in thoroughness, in efficiency, in doing things right. It’s a testament to our commitment to quality and our knack for leveraging technology to solve real-world problems. At FunkPd, tools like SitemapScanner set us apart. They’re why we can promise the best service and deliver it, day in and day out.</p>
+        <p>So, whether you’re out to conquer the SEO world, keep a sharp eye on site performance, or ensure every page gets its due, SitemapScanner is your ally. It’s part of our arsenal at FunkPd, and it can be part of yours too. Let’s make the web work better, together.</p>
+
+    </section>
+
     <footer><a href="https://funkpd.com/" title="goto:funkpd.com">internet with soul.</a></footer>
-    <script src="/main.js" title="JavaScript code for generating sitemaps"></script>
+    <script src="./main.js" title="JavaScript code for generating sitemaps"></script>
 </body>
 
 </html>

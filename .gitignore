@@ -1,0 +1,131 @@
+# .gitignore custom
+
+ratelimit/
+
+
+
+# .gitignore defaults
+
+## Compressed Files
+*.gz                  # Gzip compressed files
+*.zip                 # Zip compressed files
+*.tar                 # Tarball files
+*.rar                 # RAR compressed files
+*.7z                  # 7-zip compressed files
+*.tar.gz              # Gzipped tarball files
+*.tar.bz2             # Bzip2 compressed tarball files
+
+## Database Files
+*.sql                 # SQL database dumps
+*.sqlite              # SQLite database files
+*.sqlite3             # SQLite3 database files
+
+## Log Files
+*.log                 # Log files
+*.log.old             # Old log files
+log/                  # Log directory
+logs/                 # Logs directory
+
+## Backup Files
+*.bak*                # Backup files with various .bak extensions
+*.dis.*               # Disabled files with .dis extension
+*.backup              # Backup files
+*.bkp                 # Backup files with .bkp extension
+*.temp                # Temporary files
+*.old                 # Old files
+
+## Environment Files
+.env                  # Environment variables file
+.env.*                # Environment variables files with various extensions
+*.local               # Local environment settings files
+*.secret              # Secret settings files
+.env.testing          # Testing environment variables file
+.env.staging          # Staging environment variables file
+
+## PHP
+vendor/               # Composer dependencies directory
+composer.lock         # Composer lock file for dependency versions
+composer.phar         # Composer PHP archive
+*.cache               # Cache files
+.idea/                # IntelliJ IDEA project settings directory
+nbproject/            # NetBeans project settings directory
+
+## Python
+__pycache__/          # Python bytecode cache directory
+*.py[cod]             # Compiled Python files (.pyc, .pyo, .pyd)
+*.pyo                 # Optimized Python files
+*.pyd                 # Python DLL files
+*.pyp                 # Python source files
+*.pyt                 # Python test files
+*.pkl                 # Pickle files
+*.egg                 # Python egg files
+*.egg-info/           # Python egg metadata directory
+dist/                 # Distribution directory
+build/                # Build directory
+*.tmp                 # Temporary files
+*.cache               # Cache files
+*.bin                 # Binary files
+
+## Node.js
+node_modules/         # Node.js dependencies directory
+npm-debug.log         # NPM debug log file
+yarn-debug.log        # Yarn debug log file
+yarn-error.log        # Yarn error log file
+.npm/                 # NPM settings directory
+.nvmrc                # Node version manager settings file
+.nvm/                 # Node version manager directory
+dist/                 # Distribution directory
+coverage/             # Coverage reports directory
+*.pid                 # Process ID files
+*.seed                # Seed files for database initialization
+.idea/                # IntelliJ IDEA project settings directory
+.vscode/              # Visual Studio Code project settings directory
+*.tgz                 # Tarball files with gzip compression
+
+## WordPress
+wp-config.php         # WordPress configuration file
+wp-content/uploads/   # WordPress uploads directory
+wp-content/upgrade/   # WordPress upgrade directory
+wp-content/backup-db/ # WordPress database backup directory
+wp-content/cache/     # WordPress cache directory
+.sass-cache/          # SASS cache directory
+*.mo                  # Compiled translation files
+*.po                  # Translation source files
+
+## Bash
+*.sh~                 # Backup shell script files
+
+## Mautic
+app/cache/            # Mautic application cache directory
+app/logs/             # Mautic application logs directory
+var/cache/            # Mautic variable cache directory
+var/logs/             # Mautic variable logs directory
+media/cache/          # Mautic media cache directory
+media/files/          # Mautic media files directory
+media/tmp/            # Mautic media temporary files
+media/upload/         # Mautic media upload directory
+translations/language/ # Mautic language translation files
+themes/               # Mautic themes directory
+plugins/              # Mautic plugins directory
+media/                # Mautic media directory
+local.php             # Mautic local configuration file
+
+## Build Artifacts
+build/                # Build directory for compiled files
+out/                  # Output directory for compiled files
+
+## Test Coverage Reports
+coverage/             # Coverage reports directory
+*.lcov                # LCOV coverage files
+
+## Package Archives
+*.gem                 # Ruby gem files
+*.whl                 # Python wheel files
+*.tar.xz              # Tarball files with xz compression
+
+## Configuration Files
+.pdm.toml             # PDM dependency manager configuration file
+Pipfile               # Pipenv dependency manager configuration file
+
+## Custom Config Files
+custom_config/        # Custom configuration files directory
