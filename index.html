@@ -246,15 +246,50 @@
         width: 100%;
         opacity: 1;
       }
-      
+
       .blinking-cursor::after {
         animation: none;
       }
     }
+
+    .copy-link {
+      background: transparent;
+      border: none;
+      color: inherit;
+      cursor: pointer;
+      padding: 0;
+      font: inherit;
+      text-align: left;
+    }
+
+    .flash {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: #333;
+      color: #fff;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: opacity 0.2s;
+    }
+
+    .opacity-0 {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    body.high-contrast {
+      background: #000 !important;
+      color: #FFF !important;
+    }
+
+    body.high-contrast .terminal-container {
+      border-color: #FFF;
+    }
   </style>
 </head>
 <body>
-  <div class="terminal-container">
+  <div id="terminal" class="terminal-container">
     <div id="outputArea" class="terminal-output" role="log" aria-live="polite" aria-label="Terminal output">
       <p class="typing-effect-line success">Welcome to SitemapScanner v2.0</p>
       <p class="typing-effect-line" style="animation-delay: 0.2s;">Type 'help' for commands.</p>
@@ -279,6 +314,7 @@
       />
     </div>
   </div>
+  <div id="flash" class="flash opacity-0" aria-live="polite"></div>
   <script>
     (function() {
       'use strict';
@@ -288,6 +324,26 @@
         crawlHistory: [],
         isProcessing: false
       };
+
+      const fortunes = [
+        'Build fast, break nothing.',
+        'Less code, more clarity.',
+        'Automate the boring stuff.'
+      ];
+
+      const konamiSeq = [
+        'ArrowUp',
+        'ArrowUp',
+        'ArrowDown',
+        'ArrowDown',
+        'ArrowLeft',
+        'ArrowRight',
+        'ArrowLeft',
+        'ArrowRight',
+        'b',
+        'a'
+      ];
+      let konamiStep = 0;
 
       function escapeHtml(text) {
         const div = document.createElement('div');
@@ -341,26 +397,49 @@
         }
       }
 
-      function addLine(text, className = '') {
+      function addLine(text, className = '', child) {
         const outputArea = document.getElementById('outputArea');
         const line = document.createElement('p');
-        
+
         line.className = 'typing-effect-line' + (className ? ' ' + className : '');
-        line.textContent = text;
+        if (child) {
+          line.appendChild(child);
+        } else {
+          line.textContent = text;
+        }
         line.style.animationDelay = `${state.currentAnimationDelay}s`;
-        
-        if (text.length > 80) {
+
+        const len = child ? child.textContent.length : text.length;
+        if (len > 80) {
           line.classList.add('full-width');
         }
-        
+
         outputArea.appendChild(line);
         state.currentAnimationDelay += 0.03;
-        
+
         setTimeout(() => {
           outputArea.scrollTop = outputArea.scrollHeight;
         }, state.currentAnimationDelay * 1000);
 
         return line;
+      }
+
+      function addUrlButton(url) {
+        const btn = document.createElement('button');
+        btn.className = 'copy-link url-item';
+        btn.dataset.url = url;
+        btn.textContent = url;
+        btn.addEventListener('click', () => {
+          navigator.clipboard.writeText(url).then(() => flash('copied'));
+        });
+        addLine('', '', btn);
+      }
+
+      function flash(text) {
+        const box = document.getElementById('flash');
+        box.textContent = text;
+        box.classList.remove('opacity-0');
+        setTimeout(() => box.classList.add('opacity-0'), 800);
       }
 
       function clearOutput() {
@@ -408,6 +487,15 @@
         addLine(`Browser: ${navigator.userAgent.split(' ')[0]}`);
       }
 
+      function showFortune() {
+        const msg = fortunes[Math.floor(Math.random() * fortunes.length)];
+        addLine(msg, 'success');
+      }
+
+      function showUptime() {
+        addLine('up 10 years, fan RPM 9001', 'success');
+      }
+
       async function fetchSitemap(url) {
         const response = await fetch(`./get_sitemap.php?url=${encodeURIComponent(url)}`);
         const data = await response.json();
@@ -444,9 +532,34 @@
           showHistory();
           return;
         }
-        
+
         if (command === 'status') {
           showStatus();
+          return;
+        }
+
+        if (command === 'fortune') {
+          showFortune();
+          return;
+        }
+
+        if (command === 'uptime') {
+          showUptime();
+          return;
+        }
+
+        if (command.startsWith('copy ')) {
+          const idx = parseInt(command.split(' ')[1], 10);
+          if (!idx) {
+            addLine('Missing index; use copy <n>', 'error');
+            return;
+          }
+          const entry = state.crawlHistory[idx - 1];
+          if (!entry) {
+            addLine('Index not found in history.', 'error');
+            return;
+          }
+          navigator.clipboard.writeText(entry.url).then(() => addLine('\u2611 copied'));
           return;
         }
         
@@ -473,7 +586,7 @@
           } else {
             const displayUrls = uniqueUrls.slice(0, 1000);
             displayUrls.forEach(url => {
-              addLine(url, 'url-item');
+              addUrlButton(url);
             });
             
             if (uniqueUrls.length > 1000) {
@@ -500,21 +613,48 @@
           if (e.key === 'Enter') {
             const command = input.value;
             input.value = '';
-            
+
             if (command.trim()) {
               processCommand(command);
             }
           }
-          
+
           if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
             e.preventDefault();
           }
         });
-        
-        document.addEventListener('click', function() {
-          input.focus();
+
+        const term = document.getElementById('terminal');
+        let selecting = false;
+
+        term.addEventListener('mousedown', () => selecting = true);
+        window.addEventListener('mouseup', () => selecting = false);
+
+        setInterval(() => {
+          if (!selecting && document.activeElement !== input) input.focus();
+        }, 300);
+
+        document.getElementById('outputArea').addEventListener('click', function(e) {
+          if (e.target.classList.contains('copy-link')) {
+            navigator.clipboard.writeText(e.target.dataset.url)
+              .then(() => flash('copied'));
+          }
         });
-        
+
+        window.addEventListener('keydown', function(e) {
+          if (e.key === konamiSeq[konamiStep]) {
+            konamiStep += 1;
+            if (konamiStep === konamiSeq.length) {
+              konamiStep = 0;
+              addLine('FUNKPD DEV MODE ENABLED', 'success');
+              document.body.classList.add('high-contrast');
+              setTimeout(() => document.body.classList.remove('high-contrast'), 5000);
+            }
+          } else {
+            konamiStep = 0;
+          }
+        });
+
         input.focus();
       });
       
