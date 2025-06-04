@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sitemap Scanner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+
+    /* Webkit-based (Chrome, Edge, Safari) */
+    .terminal-output::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .terminal-output::-webkit-scrollbar-track {
+        background: #1a1a1a;
+    }
+
+    .terminal-output::-webkit-scrollbar-thumb {
+        background-color: #333;
+        border-radius: 4px;
+        border: 2px solid #1a1a1a;
+    }
+
+    .terminal-output::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+    }
+
+    /* Firefox */
+    .terminal-output {
+        scrollbar-width: thin;
+        scrollbar-color: #333 #1a1a1a;
+    }
+
+
+    body {
+      font-family: 'Fira Code', monospace;
+      background-color: #1a1a1a;
+      color: #E0E0E0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1rem;
+      overflow: hidden;
+      margin: 0;
+    }
+
+    .terminal-container {
+      width: 100%;
+      max-width: 960px;
+      height: 85vh;
+      background-color: #1a1a1a;
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #333;
+      border-radius: 8px;
+    }
+
+    .terminal-output {
+      flex-grow: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 0.5rem 1.5rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .terminal-input-line {
+      display: flex;
+      align-items: baseline;
+      padding: 0.5rem 1.5rem;
+      border-top: 1px solid #333;
+    }
+
+    .terminal-prompt {
+      display: flex;
+      align-items: center;
+      margin-right: 0.5rem;
+      flex-shrink: 0;
+    }
+
+    .prompt-segment {
+      padding: 0 0.4rem;
+      font-size: 0.85rem;
+    }
+
+    .prompt-user-host {
+      background-color: #3A3A3A;
+      border-radius: 2px 0 0 2px;
+    }
+
+    .prompt-path {
+      background-color: #555555;
+      margin-left: 1px;
+      border-radius: 0 2px 2px 0;
+    }
+
+    .prompt-arrow {
+      color: #88FFD1;
+      margin-left: 0.5rem;
+    }
+
+    .terminal-input {
+      flex-grow: 1;
+      background-color: transparent;
+      border: none;
+      color: #E0E0E0;
+      outline: none;
+      caret-color: #88FFD1;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+
+    .typing-effect-line {
+      animation: typing 0.03s steps(1) forwards;
+      width: 0;
+      opacity: 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .typing-effect-line.full-width {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .error {
+      color: #FF6B6B;
+    }
+
+    .warning {
+      color: #FFE066;
+    }
+
+    .success {
+      color: #51CF66;
+    }
+
+    .url-item {
+      color: #91A7FF;
+      margin-left: 1rem;
+    }
+
+    @keyframes typing {
+      from { 
+        width: 0; 
+        opacity: 0; 
+      }
+      to { 
+        width: 100%; 
+        opacity: 1; 
+      }
+    }
+
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      51%, 100% { opacity: 0; }
+    }
+
+    .blinking-cursor::after {
+      content: '';
+      display: inline-block;
+      width: 2px;
+      height: 1em;
+      background-color: #88FFD1;
+      animation: blink 1s infinite;
+      margin-left: 2px;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 0.5rem;
+      }
+      
+      .terminal-container {
+        height: 90vh;
+        border-radius: 0;
+        border: none;
+      }
+      
+      .terminal-output {
+        padding: 0.5rem 1rem;
+        font-size: 0.8rem;
+      }
+      
+      .terminal-input-line {
+        padding: 0.5rem 1rem;
+      }
+      
+      .prompt-segment {
+        padding: 0 0.3rem;
+        font-size: 0.75rem;
+      }
+      
+      .terminal-input {
+        font-size: 0.8rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .prompt-user-host, .prompt-path {
+        display: none;
+      }
+      
+      .prompt-arrow {
+        margin-left: 0;
+      }
+    }
+
+    @media (pointer: coarse) {
+      .terminal-input {
+        font-size: 16px;
+        padding: 0.25rem 0;
+      }
+      
+      .terminal-input-line {
+        padding: 0.75rem 1rem;
+      }
+    }
+
+    @media (prefers-contrast: high) {
+      body {
+        background-color: #000;
+        color: #FFF;
+      }
+      
+      .terminal-container {
+        border-color: #FFF;
+      }
+      
+      .error {
+        color: #FF0000;
+      }
+      
+      .success {
+        color: #00FF00;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .typing-effect-line {
+        animation: none;
+        width: 100%;
+        opacity: 1;
+      }
+      
+      .blinking-cursor::after {
+        animation: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="terminal-container">
+    <div id="outputArea" class="terminal-output" role="log" aria-live="polite" aria-label="Terminal output">
+      <p class="typing-effect-line success">Welcome to SitemapScanner v2.0</p>
+      <p class="typing-effect-line" style="animation-delay: 0.2s;">Type 'help' for commands.</p>
+    </div>
+    <div class="terminal-input-line">
+      <span class="terminal-prompt">
+        <span class="prompt-segment prompt-user-host">user@dev</span>
+        <span class="prompt-segment prompt-path">~/sitemap</span>
+        <span class="prompt-arrow">❯</span>
+      </span>
+      <input 
+        type="text" 
+        id="commandInput" 
+        class="terminal-input blinking-cursor" 
+        autofocus 
+        autocomplete="off"
+        autocapitalize="off"
+        autocorrect="off"
+        spellcheck="false"
+        aria-label="Command input"
+        placeholder="Enter command or URL..."
+      />
+    </div>
+  </div>
+  <script>
+    (function() {
+      'use strict';
+      
+      let state = {
+        currentAnimationDelay: 0.4,
+        crawlHistory: [],
+        isProcessing: false
+      };
+
+      function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      function normalizeUrl(input) {
+        if (!input || typeof input !== 'string') {
+          throw new Error('Invalid input: URL must be a non-empty string');
+        }
+
+        let cleanInput = input.trim();
+        
+        if (!cleanInput) {
+          throw new Error('Invalid input: URL cannot be empty');
+        }
+
+        if (/[<>'"{}|\\^`\[\]]/.test(cleanInput)) {
+          throw new Error('Invalid input: URL contains invalid characters');
+        }
+
+        if (!cleanInput.match(/^https?:\/\//i)) {
+          cleanInput = 'https://' + cleanInput;
+        }
+
+        let url;
+        try {
+          url = new URL(cleanInput);
+        } catch {
+          throw new Error('Invalid URL format');
+        }
+
+        if (!['http:', 'https:'].includes(url.protocol)) {
+          throw new Error('Invalid protocol: only HTTP and HTTPS are supported');
+        }
+
+        return url.toString();
+      }
+
+      function logActivity(action, url, result) {
+        state.crawlHistory.push({
+          timestamp: new Date().toISOString(),
+          action,
+          url,
+          result: result || 'success'
+        });
+        
+        if (state.crawlHistory.length > 100) {
+          state.crawlHistory = state.crawlHistory.slice(-100);
+        }
+      }
+
+      function addLine(text, className = '') {
+        const outputArea = document.getElementById('outputArea');
+        const line = document.createElement('p');
+        
+        line.className = 'typing-effect-line' + (className ? ' ' + className : '');
+        line.textContent = text;
+        line.style.animationDelay = `${state.currentAnimationDelay}s`;
+        
+        if (text.length > 80) {
+          line.classList.add('full-width');
+        }
+        
+        outputArea.appendChild(line);
+        state.currentAnimationDelay += 0.03;
+        
+        setTimeout(() => {
+          outputArea.scrollTop = outputArea.scrollHeight;
+        }, state.currentAnimationDelay * 1000);
+
+        return line;
+      }
+
+      function clearOutput() {
+        const outputArea = document.getElementById('outputArea');
+        outputArea.innerHTML = '';
+        state.currentAnimationDelay = 0;
+        addLine('Welcome to SitemapScanner v2.0', 'success');
+        addLine('Type \'help\' for commands.');
+      }
+
+      function showHelp() {
+        addLine('Available commands:', 'success');
+        addLine('  help      - Show this help message');
+        addLine('  clear     - Clear the terminal');
+        addLine('  history   - Show crawl history');
+        addLine('  status    - Show current status');
+        addLine('  <url>     - Scan sitemap for the given URL');
+        addLine('');
+        addLine('Examples:');
+        addLine('  example.com');
+        addLine('  https://example.com/sitemap.xml');
+        addLine('  https://blog.example.com/sitemap_index.xml');
+      }
+
+      function showHistory() {
+        if (state.crawlHistory.length === 0) {
+          addLine('No crawl history available.', 'warning');
+          return;
+        }
+
+        addLine('Recent crawl history:', 'success');
+        addLine('');
+        
+        state.crawlHistory.slice(-10).forEach(entry => {
+          const timestamp = new Date(entry.timestamp).toLocaleTimeString();
+          const status = entry.result === 'success' ? '✓' : '✗';
+          addLine(`${timestamp} ${status} ${entry.action}: ${entry.url}`);
+        });
+      }
+
+      function showStatus() {
+        addLine('System Status:', 'success');
+        addLine(`Processing: ${state.isProcessing ? 'Yes' : 'No'}`);
+        addLine(`History entries: ${state.crawlHistory.length}`);
+        addLine(`Browser: ${navigator.userAgent.split(' ')[0]}`);
+      }
+
+      async function fetchSitemap(url) {
+        const response = await fetch(`./get_sitemap.php?url=${encodeURIComponent(url)}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+          throw new Error(data.message || 'Failed to fetch sitemap');
+        }
+        
+        return data.sitemap;
+      }
+
+      async function processCommand(input) {
+        if (state.isProcessing) {
+          addLine('Another operation is in progress. Please wait...', 'warning');
+          return;
+        }
+
+        const command = input.trim().toLowerCase();
+        const originalInput = escapeHtml(input);
+        
+        addLine(`user@dev:~/sitemap ❯ ${originalInput}`);
+        
+        if (command === 'help') {
+          showHelp();
+          return;
+        }
+        
+        if (command === 'clear') {
+          setTimeout(clearOutput, 100);
+          return;
+        }
+        
+        if (command === 'history') {
+          showHistory();
+          return;
+        }
+        
+        if (command === 'status') {
+          showStatus();
+          return;
+        }
+        
+        if (!command) {
+          return;
+        }
+        
+        state.isProcessing = true;
+        
+        try {
+          const normalizedUrl = normalizeUrl(input);
+          addLine(`Scanning: ${normalizedUrl}`, 'success');
+          
+          const urls = await fetchSitemap(normalizedUrl);
+          
+          const uniqueUrls = [...new Set(urls)].sort();
+          
+          addLine('');
+          addLine(`Found ${uniqueUrls.length} unique URLs:`, 'success');
+          addLine('');
+          
+          if (uniqueUrls.length === 0) {
+            addLine('No URLs found in sitemap.', 'warning');
+          } else {
+            const displayUrls = uniqueUrls.slice(0, 1000);
+            displayUrls.forEach(url => {
+              addLine(url, 'url-item');
+            });
+            
+            if (uniqueUrls.length > 1000) {
+              addLine(`... and ${uniqueUrls.length - 1000} more URLs (truncated for display)`, 'warning');
+            }
+          }
+          
+          addLine('');
+          addLine('Scan complete.', 'success');
+          logActivity('scan', normalizedUrl, 'success');
+          
+        } catch (error) {
+          addLine(`Error: ${error.message}`, 'error');
+          logActivity('scan', input, error.message);
+        } finally {
+          state.isProcessing = false;
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const input = document.getElementById('commandInput');
+        
+        input.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            const command = input.value;
+            input.value = '';
+            
+            if (command.trim()) {
+              processCommand(command);
+            }
+          }
+          
+          if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+            e.preventDefault();
+          }
+        });
+        
+        document.addEventListener('click', function() {
+          input.focus();
+        });
+        
+        input.focus();
+      });
+      
+    })();
+  </script>
+</body>
+</html>
