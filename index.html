@@ -3,7 +3,45 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sitemap Scanner</title>
+  <title>Get Sitemap: Terminal Tool to Extract Sitemap URLs</title>
+<meta name="description" content="Get sitemap URLs fast. SitemapScanner is a terminal-style tool that fetches and parses XML sitemaps. Just type a URL and get the links." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://getsitemap.funkpd.com" />
+
+<!-- OpenGraph -->
+<meta property="og:title" content="SitemapScanner: Instantly Extract Sitemap Links" />
+<meta property="og:description" content="Scan any site’s XML sitemap. Paste a URL and get all indexed pages in seconds. Built by FunkPd for devs and SEOs." />
+<meta property="og:url" content="https://getsitemap.funkpd.com" />
+<meta property="og:site_name" content="FunkPd" />
+<meta property="og:image" content="https://funkpd.com/get_sitemap.webp" />
+<meta property="og:type" content="website" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Get Sitemap Links Instantly" />
+<meta name="twitter:description" content="Paste a URL. Get every sitemap page. No login. No noise. Just URLs." />
+<meta name="twitter:image" content="https://funkpd.com/get_sitemap.webp" />
+<meta name="twitter:site" content="@funk_pd" />
+
+<!-- Schema -->
+<script type="application/ld+json">
+{
+"@context": "https://schema.org",
+"@type": "SoftwareApplication",
+"name": "Sitemap Scanner",
+"alternateName": "Get Sitemap",
+"operatingSystem": "All",
+"applicationCategory": "DeveloperTool",
+"description": "Terminal-style sitemap fetcher and parser for devs and SEOs. Enter a URL, get sitemap links instantly.",
+"url": "https://getsitemap.funkpd.com",
+"publisher": {
+    "@type": "Organization",
+    "name": "FunkPd",
+    "url": "https://funkpd.com"
+}
+}
+</script>
+
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
   <style>
 
@@ -292,7 +330,9 @@
 <body>
   <div id="terminal" class="terminal-container">
     <div id="outputArea" class="terminal-output" role="log" aria-live="polite" aria-label="Terminal output">
-      <p class="typing-effect-line success">Welcome to SitemapScanner v2.0</p>
+      <h1 class="typing-effect-line success">Get Sitemap URLs <br>Instantly with a Fast <br>Terminal-Style Scanner</h1>
+      <p class="typing-effect-line success">Get Sitemap is a fast XML sitemap parser <br>for developers and SEOs. <br>Also known as SitemapScanner by FunkPd.</p>
+      <a class="typing-effect-line success" href="https://funkpd.com">Website by FunkPd. internet with soul.</a>
       <p class="typing-effect-line" style="animation-delay: 0.2s;">Type 'help' for commands.</p>
     </div>
     <div class="terminal-input-line">
@@ -433,14 +473,15 @@
         setTimeout(() => box.classList.add('opacity-0'), 800);
       }
 
-      function clearOutput() {
-        const outputArea = document.getElementById('outputArea');
-        outputArea.innerHTML = '';
-        state.currentAnimationDelay = 0;
-        state.currentUrls = [];
-        addLine('Welcome to SitemapScanner v2.0', 'success');
-        addLine('Type \'help\' for commands.');
-      }
+function clearOutput() {
+  const outputArea = document.getElementById('outputArea');
+  outputArea.innerHTML = '';
+  state.currentAnimationDelay = 0;
+  state.currentUrls = []; // safe to clear here
+  addLine('Welcome to SitemapScanner v2.0', 'success');
+  addLine('Type \'help\' for commands.');
+}
+
 
       function showHelp() {
         addLine('Available commands:', 'success');
@@ -571,7 +612,7 @@
           
           state.currentUrls = uniqueUrls;
           addLine('');
-          addLine(`Found ${uniqueUrls.length} unique URLs:`, 'success');
+          addLine(`Found ${uniqueUrls.length} unique URLs:`, 'hsuccess');
           addLine('');
           
           if (uniqueUrls.length === 0) {
@@ -595,7 +636,7 @@
           addLine(`Error: ${error.message}`, 'error');
           logActivity('scan', input, error.message);
         } finally {
-          state.currentUrls = [];
+        //   state.currentUrls = []; // do not reset here or clicktocopy breaks.
           state.isProcessing = false;
         }
       }
@@ -624,10 +665,10 @@
         term.addEventListener('pointerdown', () => selecting = true);
         window.addEventListener('pointerup', () => selecting = false);
 
-        setInterval(() => {
-          if (!selecting && document.activeElement !== input) input.focus();
-        }, 300);
         const copyBtn = document.getElementById("copyAllBtn");
+        setInterval(() => {
+          if (!selecting && document.activeElement !== input && document.activeElement !== copyBtn) input.focus();
+        }, 300);
         copyBtn.addEventListener("click", () => {
           const list = state.currentUrls || [];
           if (!list.length) {
@@ -654,6 +695,8 @@
         input.focus();
       });
       
+
+
     })();
   </script>
 </body>
