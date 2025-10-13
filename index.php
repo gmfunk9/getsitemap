@@ -1,331 +1,59 @@
+<?php
+$siteUrl = 'https://getsitemap.funkpd.com';
+$siteTitle = 'Get Sitemap: Terminal Tool to Extract Sitemap URLs';
+$siteDescription = 'Get sitemap URLs fast. SitemapScanner is a terminal-style tool that fetches and parses XML sitemaps. Just type a URL and get the links.';
+$openGraphTitle = 'SitemapScanner: Instantly Extract Sitemap Links';
+$openGraphDescription = 'Scan any site’s XML sitemap. Paste a URL and get all indexed pages in seconds. Built by FunkPd for devs and SEOs.';
+$twitterTitle = 'Get Sitemap Links Instantly';
+$twitterDescription = 'Paste a URL. Get every sitemap page. No login. No noise. Just URLs.';
+$previewImageUrl = 'https://funkpd.com/get_sitemap.webp';
+$brandName = 'FunkPd';
+$brandUrl = 'https://funkpd.com';
+$twitterHandle = '@funk_pd';
+$schemaData = [
+    '@context' => 'https://schema.org',
+    '@type' => 'SoftwareApplication',
+    'name' => 'Sitemap Scanner',
+    'alternateName' => 'Get Sitemap',
+    'operatingSystem' => 'All',
+    'applicationCategory' => 'DeveloperTool',
+    'description' => 'Terminal-style sitemap fetcher and parser for devs and SEOs. Enter a URL, get sitemap links instantly.',
+    'url' => $siteUrl,
+    'publisher' => [
+        '@type' => 'Organization',
+        'name' => $brandName,
+        'url' => $brandUrl,
+    ],
+];
+$schemaJson = json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Get Sitemap: Terminal Tool to Extract Sitemap URLs</title>
-<meta name="description" content="Get sitemap URLs fast. SitemapScanner is a terminal-style tool that fetches and parses XML sitemaps. Just type a URL and get the links." />
-<meta name="robots" content="index, follow" />
-<link rel="canonical" href="https://getsitemap.funkpd.com" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg">
-<!-- OpenGraph -->
-<meta property="og:title" content="SitemapScanner: Instantly Extract Sitemap Links" />
-<meta property="og:description" content="Scan any site’s XML sitemap. Paste a URL and get all indexed pages in seconds. Built by FunkPd for devs and SEOs." />
-<meta property="og:url" content="https://getsitemap.funkpd.com" />
-<meta property="og:site_name" content="FunkPd" />
-<meta property="og:image" content="https://funkpd.com/get_sitemap.webp" />
-<meta property="og:type" content="website" />
-
-<!-- Twitter -->
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Get Sitemap Links Instantly" />
-<meta name="twitter:description" content="Paste a URL. Get every sitemap page. No login. No noise. Just URLs." />
-<meta name="twitter:image" content="https://funkpd.com/get_sitemap.webp" />
-<meta name="twitter:site" content="@funk_pd" />
-
-<!-- Schema -->
-<script type="application/ld+json">
-{
-"@context": "https://schema.org",
-"@type": "SoftwareApplication",
-"name": "Sitemap Scanner",
-"alternateName": "Get Sitemap",
-"operatingSystem": "All",
-"applicationCategory": "DeveloperTool",
-"description": "Terminal-style sitemap fetcher and parser for devs and SEOs. Enter a URL, get sitemap links instantly.",
-"url": "https://getsitemap.funkpd.com",
-"publisher": {
-    "@type": "Organization",
-    "name": "FunkPd",
-    "url": "https://funkpd.com"
-}
-}
-</script>
-
+  <title><?= htmlspecialchars($siteTitle, ENT_QUOTES) ?></title>
+  <meta name="description" content="<?= htmlspecialchars($siteDescription, ENT_QUOTES) ?>" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="<?= htmlspecialchars($siteUrl, ENT_QUOTES) ?>" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <!-- OpenGraph -->
+  <meta property="og:title" content="<?= htmlspecialchars($openGraphTitle, ENT_QUOTES) ?>" />
+  <meta property="og:description" content="<?= htmlspecialchars($openGraphDescription, ENT_QUOTES) ?>" />
+  <meta property="og:url" content="<?= htmlspecialchars($siteUrl, ENT_QUOTES) ?>" />
+  <meta property="og:site_name" content="<?= htmlspecialchars($brandName, ENT_QUOTES) ?>" />
+  <meta property="og:image" content="<?= htmlspecialchars($previewImageUrl, ENT_QUOTES) ?>" />
+  <meta property="og:type" content="website" />
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="<?= htmlspecialchars($twitterTitle, ENT_QUOTES) ?>" />
+  <meta name="twitter:description" content="<?= htmlspecialchars($twitterDescription, ENT_QUOTES) ?>" />
+  <meta name="twitter:image" content="<?= htmlspecialchars($previewImageUrl, ENT_QUOTES) ?>" />
+  <meta name="twitter:site" content="<?= htmlspecialchars($twitterHandle, ENT_QUOTES) ?>" />
+  <!-- Schema -->
+  <script type="application/ld+json"><?= $schemaJson ?></script>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
-  <style>
-
-    /* Webkit-based (Chrome, Edge, Safari) */
-    .terminal-output::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    .terminal-output::-webkit-scrollbar-track {
-        background: #1a1a1a;
-    }
-
-    .terminal-output::-webkit-scrollbar-thumb {
-        background-color: #333;
-        border-radius: 4px;
-        border: 2px solid #1a1a1a;
-    }
-
-    .terminal-output::-webkit-scrollbar-thumb:hover {
-        background-color: #555;
-    }
-
-    /* Firefox */
-    .terminal-output {
-        scrollbar-width: thin;
-        scrollbar-color: #333 #1a1a1a;
-    }
-
-
-    body {
-      font-family: 'Fira Code', monospace;
-      background-color: #1a1a1a;
-      color: #E0E0E0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 1rem;
-      overflow: hidden;
-      margin: 0;
-    }
-
-    .terminal-container {
-      width: 100%;
-      max-width: 960px;
-      height: 85vh;
-      background-color: #1a1a1a;
-      display: flex;
-      flex-direction: column;
-      border: 1px solid #333;
-      border-radius: 8px;
-    }
-
-    .terminal-output {
-      flex-grow: 1;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 0.5rem 1.5rem;
-      font-size: 0.9rem;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    .terminal-input-line {
-      display: flex;
-      align-items: baseline;
-      padding: 0.5rem 1.5rem;
-      border-top: 1px solid #333;
-    }
-
-    .terminal-prompt {
-      display: flex;
-      align-items: center;
-      margin-right: 0.5rem;
-      flex-shrink: 0;
-    }
-
-    .prompt-segment {
-      padding: 0 0.4rem;
-      font-size: 0.85rem;
-    }
-
-    .prompt-user-host {
-      background-color: #3A3A3A;
-      border-radius: 2px 0 0 2px;
-    }
-
-    .prompt-path {
-      background-color: #555555;
-      margin-left: 1px;
-      border-radius: 0 2px 2px 0;
-    }
-
-    .prompt-arrow {
-      color: #88FFD1;
-      margin-left: 0.5rem;
-    }
-
-    .terminal-input {
-      flex-grow: 1;
-      background-color: transparent;
-      border: none;
-      color: #E0E0E0;
-      outline: none;
-      caret-color: #88FFD1;
-      font-family: inherit;
-      font-size: 0.9rem;
-    }
-
-    .typing-effect-line {
-      animation: typing 0.03s steps(1) forwards;
-      width: 0;
-      opacity: 0;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    .typing-effect-line.full-width {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
-
-    .error {
-      color: #FF6B6B;
-    }
-
-    .warning {
-      color: #FFE066;
-    }
-
-    .success {
-      color: #51CF66;
-    }
-
-    .url-item {
-      color: #91A7FF;
-      margin-left: 1rem;
-    }
-
-    @keyframes typing {
-      from { 
-        width: 0; 
-        opacity: 0; 
-      }
-      to { 
-        width: 100%; 
-        opacity: 1; 
-      }
-    }
-
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      51%, 100% { opacity: 0; }
-    }
-
-    .blinking-cursor::after {
-      content: '';
-      display: inline-block;
-      width: 2px;
-      height: 1em;
-      background-color: #88FFD1;
-      animation: blink 1s infinite;
-      margin-left: 2px;
-    }
-
-    @media (max-width: 768px) {
-      body {
-        padding: 0.5rem;
-      }
-      
-      .terminal-container {
-        height: 90vh;
-        border-radius: 0;
-        border: none;
-      }
-      
-      .terminal-output {
-        padding: 0.5rem 1rem;
-        font-size: 0.8rem;
-      }
-      
-      .terminal-input-line {
-        padding: 0.5rem 1rem;
-      }
-      
-      .prompt-segment {
-        padding: 0 0.3rem;
-        font-size: 0.75rem;
-      }
-      
-      .terminal-input {
-        font-size: 0.8rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .prompt-user-host, .prompt-path {
-        display: none;
-      }
-      
-      .prompt-arrow {
-        margin-left: 0;
-      }
-    }
-
-    @media (pointer: coarse) {
-      .terminal-input {
-        font-size: 16px;
-        padding: 0.25rem 0;
-      }
-      
-      .terminal-input-line {
-        padding: 0.75rem 1rem;
-      }
-    }
-
-    @media (prefers-contrast: high) {
-      body {
-        background-color: #000;
-        color: #FFF;
-      }
-      
-      .terminal-container {
-        border-color: #FFF;
-      }
-      
-      .error {
-        color: #FF0000;
-      }
-      
-      .success {
-        color: #00FF00;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .typing-effect-line {
-        animation: none;
-        width: 100%;
-        opacity: 1;
-      }
-
-      .blinking-cursor::after {
-        animation: none;
-      }
-    }
-
-    .copy-link {
-      background: transparent;
-      border: none;
-      color: inherit;
-      cursor: pointer;
-      padding: 0;
-      font: inherit;
-      text-align: left;
-    }
-
-    .flash {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      background: #333;
-      color: #fff;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      transition: opacity 0.2s;
-    }
-
-    .opacity-0 {
-      opacity: 0;
-      pointer-events: none;
-    }
-    .copy-all { background:#444; color:#fff; border:1px solid #666; margin-left:0.5rem; padding:0 0.5rem; cursor:pointer; }
-
-    body.high-contrast {
-      background: #000 !important;
-      color: #FFF !important;
-    }
-
-    body.high-contrast .terminal-container {
-      border-color: #FFF;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <div id="terminal" class="terminal-container">
