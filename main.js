@@ -1,4 +1,9 @@
 const elements = getElements();
+const apiModule = window.sitemapApi;
+
+if (!apiModule) {
+    throw new Error('Missing sitemapApi module; include sitemap-api.js before main.js.');
+}
 
 function getElements() {
     const form = document.getElementById('sitemapForm');
@@ -56,41 +61,6 @@ function updateButtonText(state, text) {
     state.submitText.textContent = text;
 }
 
-function validateInput(value) {
-    if (typeof value !== 'string') {
-        throw new Error('Invalid URL value; expected text input.');
-    }
-
-    const trimmed = value.trim();
-    if (trimmed === '') {
-        throw new Error('Missing field url; add to form.');
-    }
-
-    return trimmed;
-}
-
-async function fetchSitemapData(url) {
-    const response = await fetch(`get_sitemap.php?url=${encodeURIComponent(url)}`);
-    if (!response.ok) {
-        throw new Error('Request failed with status ' + response.status + '.');
-    }
-
-    return response.json();
-}
-
-function ensureSuccessPayload(payload) {
-    if (!payload.success) {
-        const message = typeof payload.message === 'string' ? payload.message : 'Unknown error from server.';
-        throw new Error(message);
-    }
-
-    if (!Array.isArray(payload.sitemap)) {
-        throw new Error('Server response missing sitemap array.');
-    }
-
-    return payload.sitemap;
-}
-
 function formatUrls(urls) {
     const unique = Array.from(new Set(urls));
     unique.sort();
@@ -116,18 +86,16 @@ async function processSubmission(state) {
         rawValue = state.urlInput.value;
     }
 
-    const validated = validateInput(rawValue);
+    const normalizedUrl = apiModule.normalizeInput(rawValue);
 
     setButtonLoading(state);
     updateButtonText(state, 'Fetching data...');
 
-    const payload = await fetchSitemapData(validated);
+    const urls = await apiModule.fetchSitemap(normalizedUrl);
     updateButtonText(state, 'Parsing sitemap...');
 
-    const urls = ensureSuccessPayload(payload);
-    updateButtonText(state, 'Finalizing...');
-
     const formatted = formatUrls(urls);
+    updateButtonText(state, 'Finalizing...');
     writeResponse(state, formatted);
 }
 
