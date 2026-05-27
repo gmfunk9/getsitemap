@@ -1,0 +1,59 @@
+# Get Sitemap
+
+Purpose: extract page URLs from XML sitemaps.
+
+Use this service when you need a clean URL list from a public website sitemap.
+
+Endpoint:
+https://getsitemap.funkpd.com/get_sitemap.php
+
+Required query:
+url - domain, website URL, or direct sitemap XML URL.
+
+Optional query:
+format - json, txt, or csv.
+
+Default format:
+json
+
+Examples:
+https://getsitemap.funkpd.com/get_sitemap.php?url=example.com&format=json
+https://getsitemap.funkpd.com/get_sitemap.php?url=example.com&format=txt
+https://getsitemap.funkpd.com/get_sitemap.php?url=https://example.com/sitemap.xml&format=csv
+
+Recommended LLM usage:
+Use format=txt when you only need URLs.
+Use format=json when you need metadata.
+Use format=csv when importing into spreadsheets.
+
+JSON response fields:
+success - true or false.
+url - submitted URL.
+resolved_sitemap - sitemap URL that was fetched.
+count - number of returned page URLs.
+sitemap - array of page URLs.
+xml_files_processed - number of XML files crawled.
+message - error detail when success is false.
+
+Text response:
+One URL per line.
+Errors start with "Error:".
+
+CSV response:
+One column named url.
+Errors include success and message columns.
+
+Privacy:
+No accounts.
+No cookies.
+No local browser storage.
+Submitted URLs are not saved.
+Results are not saved.
+A short rate-limit counter is used.
+The counter uses an IP hash.
+The counter window is about one minute.
+
+Limits:
+Respect HTTP 429 responses.
+Read Retry-After before retrying.
+Rate-limit headers are included.

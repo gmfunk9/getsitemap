@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://getsitemap.funkpd.com/sitemap.xml
+
+LLM-Info: https://getsitemap.funkpd.com/llms.txt
+API: https://getsitemap.funkpd.com/get_sitemap.php?url=example.com&format=json

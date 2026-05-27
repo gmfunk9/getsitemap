@@ -45,6 +45,23 @@ body {
     margin: 0;
 }
 
+.skip-link {
+    position: fixed;
+    left: var(--space-md);
+    top: var(--space-md);
+    background: var(--color-accent);
+    color: var(--color-background);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: 4px;
+    transform: translateY(-150%);
+    transition: transform var(--transition-fast);
+    z-index: 2;
+}
+
+.skip-link:focus {
+    transform: translateY(0);
+}
+
 .terminal-container {
     width: 100%;
     max-width: 960px;
@@ -129,6 +146,13 @@ body {
     caret-color: var(--color-accent);
     font-family: inherit;
     font-size: var(--font-size-base);
+}
+
+a:focus-visible,
+button:focus-visible,
+.terminal-input:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
 }
 
 .typing-effect-line {

@@ -1,11 +1,11 @@
 <?php
 $siteUrl = 'https://getsitemap.funkpd.com';
 $siteTitle = 'Get Sitemap: Terminal Tool to Extract Sitemap URLs';
-$siteDescription = 'Get sitemap URLs fast. SitemapScanner is a terminal-style tool that fetches and parses XML sitemaps. Just type a URL and get the links.';
+$siteDescription = 'Get sitemap URLs fast. SitemapScanner is a terminal-style XML sitemap parser with JSON, text, and CSV API output.';
 $openGraphTitle = 'SitemapScanner: Instantly Extract Sitemap Links';
-$openGraphDescription = 'Scan any site’s XML sitemap. Paste a URL and get all indexed pages in seconds. Built by FunkPd for devs and SEOs.';
+$openGraphDescription = 'Scan an XML sitemap. Paste a URL and get page links in seconds through the terminal UI or API.';
 $twitterTitle = 'Get Sitemap Links Instantly';
-$twitterDescription = 'Paste a URL. Get every sitemap page. No login. No noise. Just URLs.';
+$twitterDescription = 'Paste a URL. Get sitemap pages through the UI or API. No login or cookies.';
 $previewImageUrl = 'https://funkpd.com/get_sitemap.webp';
 $brandName = 'FunkPd';
 $brandUrl = 'https://funkpd.com';
@@ -17,7 +17,7 @@ $schemaData = [
     'alternateName' => 'Get Sitemap',
     'operatingSystem' => 'All',
     'applicationCategory' => 'DeveloperTool',
-    'description' => 'Terminal-style sitemap fetcher and parser for devs and SEOs. Enter a URL, get sitemap links instantly.',
+    'description' => 'Terminal-style sitemap fetcher and parser for devs, SEOs, and LLM agents. Enter a URL, get sitemap links, and copy or fetch the list.',
     'url' => $siteUrl,
     'publisher' => [
         '@type' => 'Organization',
@@ -36,6 +36,8 @@ $schemaJson = json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_U
   <meta name="description" content="<?= htmlspecialchars($siteDescription, ENT_QUOTES) ?>" />
   <meta name="robots" content="index, follow" />
   <link rel="canonical" href="<?= htmlspecialchars($siteUrl, ENT_QUOTES) ?>" />
+  <link rel="alternate" type="text/plain" href="/llms.txt" title="LLM usage guide" />
+  <link rel="help" href="/llms.txt" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <!-- OpenGraph -->
   <meta property="og:title" content="<?= htmlspecialchars($openGraphTitle, ENT_QUOTES) ?>" />
@@ -56,10 +58,13 @@ $schemaJson = json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_U
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <a class="skip-link" href="#commandInput">Skip to scanner input</a>
   <div id="terminal" class="terminal-container">
     <div id="outputArea" class="terminal-output" role="log" aria-live="polite" aria-label="Terminal output">
       <h1 class="typing-effect-line success">Get Sitemap URLs <br>Instantly with a Fast <br>Terminal-Style Scanner</h1>
-      <p class="typing-effect-line success">Get Sitemap is a fast XML sitemap parser <br>for developers and SEOs. <br>Also known as SitemapScanner by FunkPd.</p>
+      <p class="typing-effect-line success full-width">Paste a domain or sitemap URL. <br>Get clean page URLs back. <br>No account, cookies, or stored submitted URLs.</p>
+      <p class="typing-effect-line success full-width">API: /get_sitemap.php?url=example.com&amp;format=txt</p>
+      <p class="typing-effect-line success full-width">Try: example.com, help, api, privacy, <br>status, clear.</p>
       <a class="typing-effect-line success" href="https://funkpd.com">Website by FunkPd. internet with soul.</a>
       <p class="typing-effect-line" style="animation-delay: 0.2s;">Type 'help' for commands.</p>
     </div>
@@ -78,7 +83,7 @@ $schemaJson = json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_U
         autocapitalize="off"
         autocorrect="off"
         spellcheck="false"
-        aria-label="Command input"
+        aria-label="Command input. Enter a domain, sitemap URL, or command."
         placeholder="Enter command or URL..."
       />
         <button id="copyAllBtn" class="copy-all" aria-label="Copy URLs">copy</button>

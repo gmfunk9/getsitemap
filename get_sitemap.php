@@ -3,12 +3,11 @@
 $config = require __DIR__ . '/config/app.php';
 require __DIR__ . '/lib/rate_limit.php';
 
-setJsonHeaders();
+setBaseHeaders();
 handleOptionsRequest($_SERVER['REQUEST_METHOD'] ?? 'GET');
 handleRequest($_GET, $_SERVER, $config);
 
-function setJsonHeaders(): void {
-    header('Content-Type: application/json');
+function setBaseHeaders(): void {
     header('Access-Control-Allow-Origin: *');
     header('Access-Control-Allow-Methods: GET');
     header('Access-Control-Allow-Headers: Content-Type');
@@ -23,8 +22,11 @@ function handleOptionsRequest(string $method): void {
 }
 
 function handleRequest(array $query, array $server, array $config): void {
+    $format = getResponseFormat($query);
+    setRateLimitHeaders($config);
+
     if (!array_key_exists('url', $query)) {
-        respondWithJson(400, buildResponse(false, [
+        respondWithPayload($format, 400, buildResponse(false, [
             'message' => 'Missing field url; add to query.'
         ]));
         return;
@@ -37,8 +39,9 @@ function handleRequest(array $query, array $server, array $config): void {
 
     $isAllowed = rateLimit($clientIpAddress, $config);
     if ($isAllowed === false) {
-        respondWithJson(429, buildResponse(false, [
-            'message' => 'Rate limit exceeded for address ' . $clientIpAddress . '. Try again later.'
+        header('Retry-After: ' . $config['rate_limit_window_seconds']);
+        respondWithPayload($format, 429, buildResponse(false, [
+            'message' => 'Rate limit exceeded. Try again later.'
         ]));
         return;
     }
@@ -50,22 +53,102 @@ function handleRequest(array $query, array $server, array $config): void {
         $collectedUrls = crawlSitemap($resolvedSitemap, $config['max_depth'], $config, $processedCount);
         $finalUrls = filterAndSortUrls($collectedUrls);
 
-        respondWithJson(200, buildResponse(true, [
+        respondWithPayload($format, 200, buildResponse(true, [
             'url' => $inputUrl,
+            'resolved_sitemap' => $resolvedSitemap,
+            'count' => count($finalUrls),
             'sitemap' => $finalUrls,
             'xml_files_processed' => $processedCount
         ]));
     } catch (Exception $error) {
-        respondWithJson(400, buildResponse(false, [
+        respondWithPayload($format, 400, buildResponse(false, [
             'url' => $query['url'],
             'message' => 'Error processing sitemap: ' . $error->getMessage()
         ]));
     }
 }
 
+function getResponseFormat(array $query): string {
+    $format = 'json';
+    if (array_key_exists('format', $query)) {
+        $format = strtolower((string) $query['format']);
+    }
+
+    $isJson = $format === 'json';
+    if ($isJson) {
+        return $format;
+    }
+
+    $isText = $format === 'txt';
+    if ($isText) {
+        return $format;
+    }
+
+    $isCsv = $format === 'csv';
+    if ($isCsv) {
+        return $format;
+    }
+
+    return 'json';
+}
+
+function setRateLimitHeaders(array $config): void {
+    header('X-RateLimit-Limit: ' . $config['rate_limit_requests']);
+    header('X-RateLimit-Window: ' . $config['rate_limit_window_seconds']);
+}
+
+function respondWithPayload(string $format, int $statusCode, array $payload): void {
+    if ($format === 'txt') {
+        respondWithText($statusCode, $payload);
+        return;
+    }
+
+    if ($format === 'csv') {
+        respondWithCsv($statusCode, $payload);
+        return;
+    }
+
+    respondWithJson($statusCode, $payload);
+}
+
 function respondWithJson(int $statusCode, array $payload): void {
+    header('Content-Type: application/json; charset=utf-8');
     http_response_code($statusCode);
-    echo json_encode($payload);
+    echo json_encode($payload, JSON_UNESCAPED_SLASHES);
+}
+
+function respondWithText(int $statusCode, array $payload): void {
+    header('Content-Type: text/plain; charset=utf-8');
+    http_response_code($statusCode);
+
+    if ($payload['success'] !== true) {
+        echo 'Error: ' . $payload['message'] . "\n";
+        return;
+    }
+
+    echo implode("\n", $payload['sitemap']) . "\n";
+}
+
+function respondWithCsv(int $statusCode, array $payload): void {
+    header('Content-Type: text/csv; charset=utf-8');
+    header('Content-Disposition: inline; filename="sitemap.csv"');
+    http_response_code($statusCode);
+
+    $outputHandle = fopen('php://output', 'w');
+    if ($payload['success'] !== true) {
+        writeCsvRow($outputHandle, ['success', 'message']);
+        writeCsvRow($outputHandle, ['false', $payload['message']]);
+        return;
+    }
+
+    writeCsvRow($outputHandle, ['url']);
+    foreach ($payload['sitemap'] as $sitemapUrl) {
+        writeCsvRow($outputHandle, [$sitemapUrl]);
+    }
+}
+
+function writeCsvRow($outputHandle, array $fields): void {
+    fputcsv($outputHandle, $fields, ',', '"', '', "\n");
 }
 
 function buildResponse(bool $success, array $data): array {
@@ -178,12 +261,10 @@ function makeGETRequest(string $targetUrl, array $config): array {
         rewind($verboseHandle);
         $verboseLog = stream_get_contents($verboseHandle);
         error_log('cURL error: ' . $curlError . "\nVerbose log:\n" . $verboseLog);
-        curl_close($curlHandle);
         fclose($verboseHandle);
         throw new Exception('Request failed: ' . $curlError);
     }
 
-    curl_close($curlHandle);
     fclose($verboseHandle);
 
     if ($httpCode !== 200) {

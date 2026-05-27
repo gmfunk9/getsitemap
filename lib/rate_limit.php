@@ -4,7 +4,7 @@ function rateLimit(string $clientAddress, array $config): bool {
     $directory = __DIR__ . '/../' . $config['rate_limit_storage'];
     ensureDirectory($directory);
 
-    $filePath = $directory . '/' . preg_replace('/[^a-zA-Z0-9_.-]/', '_', $clientAddress) . '.json';
+    $filePath = getRateLimitFilePath($directory, $clientAddress);
     $currentTime = time();
 
     $data = loadRateLimitData($filePath, $currentTime);
@@ -26,6 +26,11 @@ function rateLimit(string $clientAddress, array $config): bool {
     file_put_contents($filePath, json_encode($data));
 
     return true;
+}
+
+function getRateLimitFilePath(string $directory, string $clientAddress): string {
+    $hashedClientAddress = hash('sha256', $clientAddress);
+    return $directory . '/' . $hashedClientAddress . '.json';
 }
 
 function ensureDirectory(string $directory): void {

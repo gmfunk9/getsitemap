@@ -8,6 +8,8 @@
 
     const state = {
         currentAnimationDelay: 0.4,
+        commandHistory: [],
+        commandHistoryIndex: 0,
         crawlHistory: [],
         isProcessing: false,
         currentUrls: []
@@ -95,16 +97,62 @@
 
     function showHelp() {
         addLine('Available commands:', 'success');
-        addLine('  help      - Show this help message');
+        addLine('  help      - Show commands and examples');
+        addLine('  api       - Show API and LLM usage');
+        addLine('  privacy   - Show what data is used');
+        addLine('  keyboard  - Show keyboard controls');
         addLine('  clear     - Clear the terminal');
         addLine('  history   - Show crawl history');
         addLine('  status    - Show current status');
-        addLine('  <url>     - Scan sitemap for the given URL');
+        addLine('  <url>     - Scan a domain or sitemap URL');
         addLine('');
         addLine('Examples:');
         addLine('  example.com');
         addLine('  https://example.com/sitemap.xml');
         addLine('  https://blog.example.com/sitemap_index.xml');
+        addLine('');
+        addLine('Results are sorted, unique, and copy-ready.');
+    }
+
+    function showApi() {
+        const origin = window.location.origin;
+        addLine('API for LLMs and scripts:', 'success');
+        addLine('  Endpoint: ' + origin + '/get_sitemap.php');
+        addLine('  Required query: url');
+        addLine('  Optional query: format=json|txt|csv');
+        addLine('  Default format: json');
+        addLine('  Text format returns one URL per line.');
+        addLine('  JSON includes sitemap, count, and source.');
+        addLine('  Rate limit headers are included.');
+        addLine('');
+        addLine('Examples:');
+        addLine('  ' + origin + '/get_sitemap.php?url=example.com&format=json');
+        addLine('  ' + origin + '/get_sitemap.php?url=example.com&format=txt');
+        addLine('  curl "' + origin + '/get_sitemap.php?url=example.com&format=txt"');
+        addLine('');
+        addLine('LLM guide: ' + origin + '/llms.txt');
+    }
+
+    function showPrivacy() {
+        addLine('Privacy:', 'success');
+        addLine('  No accounts.');
+        addLine('  No cookies.');
+        addLine('  No local browser storage.');
+        addLine('  Submitted URLs are not saved.');
+        addLine('  Results are not saved.');
+        addLine('  A short rate-limit counter is used.');
+        addLine('  The counter uses an IP hash.');
+        addLine('  The counter window is about one minute.');
+    }
+
+    function showKeyboard() {
+        addLine('Keyboard controls:', 'success');
+        addLine('  Tab moves through page controls.');
+        addLine('  Enter runs the typed command.');
+        addLine('  Up shows the previous command.');
+        addLine('  Down shows the next command.');
+        addLine('  Ctrl+L focuses the command input.');
+        addLine('  The copy button copies current results.');
     }
 
     function showHistory() {
@@ -202,6 +250,21 @@
             return;
         }
 
+        if (lowered === 'api') {
+            showApi();
+            return;
+        }
+
+        if (lowered === 'privacy') {
+            showPrivacy();
+            return;
+        }
+
+        if (lowered === 'keyboard') {
+            showKeyboard();
+            return;
+        }
+
         if (lowered === 'clear') {
             setTimeout(clearOutput, 100);
             return;
@@ -278,7 +341,6 @@
         const input = document.getElementById('commandInput');
         const terminal = document.getElementById('terminal');
         const copyBtn = document.getElementById('copyAllBtn');
-        let selecting = false;
 
         input.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
@@ -288,26 +350,50 @@
                     return;
                 }
 
+                state.commandHistory.push(command);
+                state.commandHistoryIndex = state.commandHistory.length;
                 processCommand(command);
                 return;
             }
 
             if (event.key === 'ArrowUp') {
                 event.preventDefault();
+                if (state.commandHistory.length === 0) {
+                    return;
+                }
+
+                state.commandHistoryIndex = Math.max(0, state.commandHistoryIndex - 1);
+                input.value = state.commandHistory[state.commandHistoryIndex];
                 return;
             }
 
             if (event.key === 'ArrowDown') {
                 event.preventDefault();
+                if (state.commandHistory.length === 0) {
+                    return;
+                }
+
+                state.commandHistoryIndex = Math.min(state.commandHistory.length, state.commandHistoryIndex + 1);
+                if (state.commandHistoryIndex === state.commandHistory.length) {
+                    input.value = '';
+                    return;
+                }
+
+                input.value = state.commandHistory[state.commandHistoryIndex];
             }
         });
 
-        terminal.addEventListener('pointerdown', () => {
-            selecting = true;
-        });
+        terminal.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target instanceof HTMLAnchorElement) {
+                return;
+            }
 
-        window.addEventListener('pointerup', () => {
-            selecting = false;
+            if (target instanceof HTMLButtonElement) {
+                return;
+            }
+
+            input.focus();
         });
 
         copyBtn.addEventListener('click', () => {
@@ -327,23 +413,15 @@
             });
         });
 
-        setInterval(() => {
-            if (selecting) {
-                return;
-            }
-
-            if (document.activeElement === input) {
-                return;
-            }
-
-            if (document.activeElement === copyBtn) {
-                return;
-            }
-
-            input.focus();
-        }, 300);
-
         window.addEventListener('keydown', (event) => {
+            const focusInputShortcut = event.ctrlKey && event.key.toLowerCase() === 'l';
+            if (focusInputShortcut) {
+                event.preventDefault();
+                input.focus();
+                input.select();
+                return;
+            }
+
             const expectedKey = konamiSeq[konamiStep];
             if (event.key === expectedKey) {
                 konamiStep = konamiStep + 1;
